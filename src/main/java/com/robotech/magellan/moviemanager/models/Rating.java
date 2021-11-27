@@ -15,7 +15,7 @@ public class Rating {
     private String critic;
 
     @Column
-    private Integer rating;
+    private Long rating;
 
     @OneToOne
     private Movie movie;
@@ -44,11 +44,11 @@ public class Rating {
         this.movie = movie;
     }
 
-    public Integer getRating() {
+    public Long getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Long rating) {
         this.rating = rating;
     }
 }
