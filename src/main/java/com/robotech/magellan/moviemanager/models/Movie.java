@@ -1,6 +1,8 @@
 package com.robotech.magellan.moviemanager.models;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Movie {
@@ -9,22 +11,22 @@ public class Movie {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    public Movie(String name, Rating rating, Director director) {
-        this.name = name;
-        this.rating = rating;
-        this.director = director;
-    }
 
     @Column
     private String name;
 
-    @OneToOne
-    private Rating rating;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "movie" )
+    private List<Rating> ratings;
 
     @OneToOne
     private Director director;
 
 
+    public Movie(String name, List<Rating> ratings, Director director) {
+        this.name = name;
+        this.ratings = ratings;
+        this.director = director;
+    }
 
     public Long getId() {
         return id;
@@ -42,12 +44,12 @@ public class Movie {
         this.name = name;
     }
 
-    public Rating getRating() {
-        return rating;
+    public List<Rating> getRatings() {
+        return ratings;
     }
 
-    public void setRating(Rating rating) {
-        this.rating = rating;
+    public void setRatings(List<Rating> ratings) {
+        this.ratings = ratings;
     }
 
     public Director getDirector() {
