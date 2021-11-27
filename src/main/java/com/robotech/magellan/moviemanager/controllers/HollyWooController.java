@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("Movies")
+@RequestMapping("HollyWoo")
 public class HollyWooController {
 
     private static final Logger L = LogManager.getLogger(HollyWooController.class);
