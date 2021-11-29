@@ -3,6 +3,7 @@ package com.robotech.magellan.moviemanager.controllers;
 
 
 import com.robotech.magellan.moviemanager.DTOs.DirectorDTO;
+import com.robotech.magellan.moviemanager.DTOs.MovieDTO;
 import com.robotech.magellan.moviemanager.models.Movie;
 import com.robotech.magellan.moviemanager.services.MovieService;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +18,7 @@ import java.util.List;
 
 
 @RestController
+@CrossOrigin(origins = {"*"})
 @RequestMapping("HollyWoo")
 public class HollyWooController {
     @Autowired
@@ -29,14 +31,39 @@ public class HollyWooController {
         return "Hello world !";
     }
 
+    /*CRUD*/
+    @PostMapping(path = "movie")
+    public Movie createMovie(@RequestBody Movie movie){
+        return movieService.createMovie(movie);
+    }
 
-    @GetMapping(path = "search-by-director")
-    public List<Movie> searcMoviesByDirector(@RequestParam String directorName){
+    @GetMapping(path = "movie")
+    public List<Movie> getMovies(){
+        return  movieService.getMovies();
+    }
+    @GetMapping(path = "movie/{id}")
+    public Movie findMovie(@PathVariable Long id){
+        return  movieService.findMovie(id);
+    }
+
+    @PutMapping(path = "movie/{id}")
+    public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movie){
+        return  movieService.updateMovie(id, movie);
+    }
+
+    @DeleteMapping(path = "movie/{id}")
+    public void deleteMovie(@PathVariable Long id){
+         movieService.deleteMovie(id);
+    }
+
+
+    @GetMapping(path = "search-by-director/{directorName}")
+    public List<Movie> searcMoviesByDirector(@PathVariable String directorName){
         return movieService.findByDirector(directorName);
     }
 
-    @GetMapping(path = "rating-higher-than")
-    public List<Movie> searchMoviesWithRatingsHigherThan(@RequestParam Long rating){
+    @GetMapping(path = "rating-higher-than/{rating}")
+    public List<Movie> searchMoviesWithRatingsHigherThan(@PathVariable Long rating){
         return movieService.findMoviesWithRatingHigerThan(rating);
     }
 }
