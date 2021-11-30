@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 public class Rating {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -17,8 +17,21 @@ public class Rating {
     @Column
     private Long ratingValue;
 
-    @OneToOne
-    private Movie movie;
+    @Column
+    private Long movie_ref;
+
+    public Rating(){
+    }
+    public Rating(Long ratingValue){
+        this.ratingValue = ratingValue;
+    }
+
+    public Rating(Long id, String critic, Long ratingValue, Long movie_ref) {
+        this.id = id;
+        this.critic = critic;
+        this.ratingValue = ratingValue;
+        this.movie_ref = movie_ref;
+    }
 
     public Long getId() {
         return id;
@@ -36,19 +49,29 @@ public class Rating {
         this.critic = critic;
     }
 
-    public Movie getMovie() {
-        return movie;
-    }
-
-    public void setMovie(Movie movie) {
-        this.movie = movie;
-    }
-
     public Long getRatingValue() {
         return ratingValue;
     }
 
     public void setRatingValue(Long ratingValue) {
         this.ratingValue = ratingValue;
+    }
+
+    public Long getMovie_ref() {
+        return movie_ref;
+    }
+
+    public void setMovie_ref(Long movie_ref) {
+        this.movie_ref = movie_ref;
+    }
+
+    @Override
+    public String toString() {
+        return "Rating{" +
+                "id=" + id +
+                ", critic='" + critic + '\'' +
+                ", ratingValue=" + ratingValue +
+                ", movie_ref=" + movie_ref +
+                '}';
     }
 }

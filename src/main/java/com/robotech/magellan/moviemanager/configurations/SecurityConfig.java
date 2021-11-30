@@ -11,10 +11,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .anyRequest()
-                .permitAll();
+        http
+                .headers().frameOptions().sameOrigin()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/h2-console/**", "/**")
+                .permitAll()
+                .anyRequest().authenticated()
+                .and().cors().and().csrf().disable();
     }
 
 //    @Autowired

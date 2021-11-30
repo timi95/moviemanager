@@ -7,20 +7,21 @@ import java.util.List;
 @Entity
 public class Movie {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
 
     @Column
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "movie" )
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true )
     private List<Rating> ratings;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private Director director;
 
+    public Movie(){
+    }
 
     public Movie(String name, List<Rating> ratings, Director director) {
         this.name = name;
@@ -58,5 +59,15 @@ public class Movie {
 
     public void setDirector(Director director) {
         this.director = director;
+    }
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", ratings=" + ratings +
+                ", director=" + director +
+                '}';
     }
 }

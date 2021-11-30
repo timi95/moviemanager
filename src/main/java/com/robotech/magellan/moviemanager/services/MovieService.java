@@ -1,6 +1,5 @@
 package com.robotech.magellan.moviemanager.services;
 
-import com.robotech.magellan.moviemanager.DTOs.DirectorDTO;
 import com.robotech.magellan.moviemanager.DTOs.MovieDTO;
 import com.robotech.magellan.moviemanager.models.Director;
 import com.robotech.magellan.moviemanager.models.Movie;
@@ -9,9 +8,11 @@ import com.robotech.magellan.moviemanager.repositories.DirectorRepository;
 import com.robotech.magellan.moviemanager.repositories.MovieRepository;
 import com.robotech.magellan.moviemanager.repositories.RatingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,27 +31,30 @@ public class MovieService {
     }
 
     public Movie findMovie(Long id){
-        return movieRepository.findById(id).get();
+        return movieRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
-    public Movie createMovie(MovieDTO movieDTO){
-        return movieRepository.save(
-                new Movie(
-                        movieDTO.name,
-                        movieDTO.ratingsList,
-                        movieDTO.director));
+    public ResponseEntity<Movie> createMovie(Movie movie){
+        movie.getRatings().forEach(r-> {
+                r.setMovie_ref(movie.getId());
+                ratingRepository.save(r);
+        });
+        movie.getDirector().setMoviesDirected(new ArrayList<Movie>() {{
+            add(movie);
+        }});
+        Movie response = movieRepository.save(movie);
+        return new ResponseEntity(response, HttpStatus.MULTI_STATUS);
     }
 
-    public Movie updateMovie(Long id, MovieDTO movieDTO){
-        Movie movie = movieRepository.findById(id).get();
-        movie.setName(movieDTO.name);
-        movie.setRatings(movieDTO.ratingsList);
-        movie.setDirector(movieDTO.director);
+    public Movie updateMovie(Long id, Movie movie){
+        movie.setName(movie.getName());
+        movie.setRatings(movie.getRatings());
+        movie.setDirector(movie.getDirector());
         return movieRepository.save(movie);
     }
 
-    public Movie addRatingToMovie(Long id, Rating rating){
-        Movie movie = movieRepository.findById(id).get();
+    public Movie addRatingToMovie(Long movieId, Rating rating){
+        Movie movie = movieRepository.findById(movieId).get();
         List<Rating> ratingsUpdatedList = movie.getRatings();
         ratingsUpdatedList.add(rating);
         movie.setRatings(ratingsUpdatedList);
@@ -73,7 +77,10 @@ public class MovieService {
         List<Movie> movies = new ArrayList<>();
         ratingRepository
                 .findByRatingValueGreaterThan(rating)
-                .forEach(r -> movies.add(r.getMovie()));
+                .forEach(r -> movies.add(
+                        movieRepository.findById(
+                                r.getMovie_ref())
+                                .get()));
         return movies;
     }
 }

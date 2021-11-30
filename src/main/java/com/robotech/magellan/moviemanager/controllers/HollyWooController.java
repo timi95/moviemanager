@@ -33,7 +33,7 @@ public class HollyWooController {
 
     /*CRUD*/
     @PostMapping(path = "movie")
-    public Movie createMovie(@RequestBody Movie movie){
+    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie){
         return movieService.createMovie(movie);
     }
 

@@ -7,6 +7,7 @@ import java.util.List;
 
 public class MovieDTO {
     public String name;
-    public List<Rating> ratingsList;
-    public Director director;
+    public List<Long> ratingsList;
+    public DirectorDTO director;
+
 }
