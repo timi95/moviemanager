@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class MovieService {
@@ -35,6 +36,7 @@ public class MovieService {
     }
 
     public ResponseEntity<Movie> createMovie(Movie movie){
+
         movie.getRatings().forEach(r-> {
         r.setMovie_ref(movie.getId());
         ratingRepository.save(r);
@@ -76,13 +78,17 @@ public class MovieService {
     }
 
     public List<Movie> findMoviesWithRatingHigerThan(Long rating){
-        List<Movie> movies = new ArrayList<>();
-        ratingRepository
-                .findByRatingValueGreaterThan(rating)
-                .forEach(r -> movies.add(
-                        movieRepository.findById(
-                                r.getMovie_ref())
-                                .get()));
+        System.out.println("ALL DIRECTORS: "+directorRepository.findByName("Pixar"));
+        List<Movie> movies = movieRepository.findAll();
+        List<Movie> diff = new ArrayList<>();
+        movies.forEach(mov ->{
+           mov.getRatings().forEach(rat->{
+               if (rat.getRatingValue() <= rating) {
+                   diff.add(mov);
+               }
+           });
+        });
+        movies.removeAll(diff);
         return movies;
     }
 }
