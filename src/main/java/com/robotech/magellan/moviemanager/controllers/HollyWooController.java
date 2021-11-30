@@ -39,16 +39,16 @@ public class HollyWooController {
     }
 
     @GetMapping(path = "movie")
-    public List<Movie> getMovies(){
+    public ResponseEntity<List<Movie>> getMovies(){
         return  movieService.getMovies();
     }
     @GetMapping(path = "movie/{id}")
-    public Movie findMovie(@PathVariable Long id){
+    public ResponseEntity<Movie> findMovie(@PathVariable Long id){
         return  movieService.findMovie(id);
     }
 
     @PutMapping(path = "movie/{id}")
-    public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movie){
+    public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie){
         return  movieService.updateMovie(id, movie);
     }
 
@@ -59,12 +59,12 @@ public class HollyWooController {
 
 
     @GetMapping(path = "search-by-director/{directorName}")
-    public List<Movie> searcMoviesByDirector(@PathVariable String directorName){
+    public ResponseEntity<List<Movie>> searcMoviesByDirector(@PathVariable String directorName){
         return movieService.findByDirector(directorName);
     }
 
     @GetMapping(path = "rating-higher-than/{rating}")
-    public List<Movie> searchMoviesWithRatingsHigherThan(@PathVariable Long rating){
+    public ResponseEntity<List<Movie>> searchMoviesWithRatingsHigherThan(@PathVariable Long rating){
         return movieService.findMoviesWithRatingHigerThan(rating);
     }
 }

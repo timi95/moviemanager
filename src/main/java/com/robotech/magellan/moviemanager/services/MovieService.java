@@ -27,12 +27,16 @@ public class MovieService {
     private RatingRepository ratingRepository;
 
     /*CRUD*/
-    public List<Movie> getMovies(){
-        return movieRepository.findAll();
+    public ResponseEntity<List<Movie>> getMovies(){
+        return new ResponseEntity(movieRepository.findAll(), HttpStatus.MULTI_STATUS);
     }
 
-    public Movie findMovie(Long id){
-        return movieRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public ResponseEntity<Movie> findMovie(Long id){
+        return new ResponseEntity(
+                movieRepository
+                        .findById(id)
+                        .orElseThrow(EntityNotFoundException::new),
+                HttpStatus.MULTI_STATUS);
     }
 
     public ResponseEntity<Movie> createMovie(Movie movie){
@@ -50,19 +54,19 @@ public class MovieService {
         return new ResponseEntity( movieRepository.save(movie), HttpStatus.MULTI_STATUS);
     }
 
-    public Movie updateMovie(Long id, Movie movie){
+    public ResponseEntity<Movie> updateMovie(Long id, Movie movie){
         movie.setName(movie.getName());
         movie.setRatings(movie.getRatings());
         movie.setDirector(movie.getDirector());
-        return movieRepository.save(movie);
+        return new ResponseEntity(movieRepository.save(movie), HttpStatus.MULTI_STATUS);
     }
 
-    public Movie addRatingToMovie(Long movieId, Rating rating){
+    public ResponseEntity<Movie> addRatingToMovie(Long movieId, Rating rating){
         Movie movie = movieRepository.findById(movieId).get();
         List<Rating> ratingsUpdatedList = movie.getRatings();
         ratingsUpdatedList.add(rating);
         movie.setRatings(ratingsUpdatedList);
-        return  movieRepository.save(movie);
+        return  new ResponseEntity(movieRepository.save(movie), HttpStatus.MULTI_STATUS);
     }
 
     public void deleteMovie(Long id){
@@ -73,11 +77,11 @@ public class MovieService {
     * Search movies by Director
     • Search movies where the rating is above a provided rating. */
 
-    public List<Movie> findByDirector(String directorName){
-        return movieRepository.findByDirectorName(directorName);
+    public ResponseEntity<List<Movie>> findByDirector(String directorName){
+        return new ResponseEntity<>(movieRepository.findByDirectorName(directorName), HttpStatus.MULTI_STATUS);
     }
 
-    public List<Movie> findMoviesWithRatingHigerThan(Long rating){
+    public ResponseEntity<List<Movie>> findMoviesWithRatingHigerThan(Long rating){
         System.out.println("ALL DIRECTORS: "+directorRepository.findByName("Pixar"));
         List<Movie> movies = movieRepository.findAll();
         List<Movie> diff = new ArrayList<>();
@@ -89,6 +93,6 @@ public class MovieService {
            });
         });
         movies.removeAll(diff);
-        return movies;
+        return new ResponseEntity(movies, HttpStatus.MULTI_STATUS);
     }
 }
