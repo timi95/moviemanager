@@ -1,8 +1,11 @@
 package com.robotech.magellan.moviemanager.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Director {
@@ -15,13 +18,14 @@ public class Director {
     private String name;
 
     @Column
-    private Integer age;
+    private Long age;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "director")
-    private List<Movie> moviesDirected = new ArrayList<>();
+    @JsonIgnoreProperties({"director"})
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "director")
+    private Set<Movie> moviesDirected = new HashSet<>();
 
     public Director(){}
-    public Director(Long id, String name, Integer age, List<Movie> moviesDirected) {
+    public Director(Long id, String name, Long age, Set<Movie> moviesDirected) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -45,20 +49,24 @@ public class Director {
         this.name = name;
     }
 
-    public Integer getAge() {
+    public Long getAge() {
         return age;
     }
 
-    public void setAge(Integer age) {
+    public void setAge(Long age) {
         this.age = age;
     }
 
-    public List<Movie> getMoviesDirected() {
+    public Set<Movie> getMoviesDirected() {
         return moviesDirected;
     }
 
-    public void setMoviesDirected(List<Movie> moviesDirected) {
+    public void setMoviesDirected(Set<Movie> moviesDirected) {
         this.moviesDirected = moviesDirected;
+    }
+
+    public void appendMovieToMoviesDirected(Movie movie){
+        this.moviesDirected.add(movie);
     }
 
     @Override
@@ -67,7 +75,7 @@ public class Director {
                 "id=" + id +
                 ", name=" + name +
                 ", age=" + age +
-                ", moviesDirected=" + moviesDirected +
+//                ", moviesDirected=" + moviesDirected.toString() +
                 '}';
     }
 }
