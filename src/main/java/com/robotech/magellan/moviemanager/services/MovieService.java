@@ -36,14 +36,16 @@ public class MovieService {
 
     public ResponseEntity<Movie> createMovie(Movie movie){
         movie.getRatings().forEach(r-> {
-                r.setMovie_ref(movie.getId());
-                ratingRepository.save(r);
+        r.setMovie_ref(movie.getId());
+        ratingRepository.save(r);
         });
-        movie.getDirector().setMoviesDirected(new ArrayList<Movie>() {{
-            add(movie);
-        }});
-        Movie response = movieRepository.save(movie);
-        return new ResponseEntity(response, HttpStatus.MULTI_STATUS);
+
+        Director director = directorRepository.findByName(movie.getDirector().getName()).isEmpty()?
+                directorRepository.save(movie.getDirector()):
+               directorRepository.findByName(movie.getDirector().getName()).get(0);
+        director.appendMovieToMoviesDirected(movie);
+        movie.setDirector(director);
+        return new ResponseEntity( movieRepository.save(movie), HttpStatus.MULTI_STATUS);
     }
 
     public Movie updateMovie(Long id, Movie movie){
