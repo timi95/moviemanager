@@ -25,6 +25,10 @@ public class Director {
     private Set<Movie> moviesDirected = new HashSet<>();
 
     public Director(){}
+    public Director(String name, Long age){
+        this.name = name;
+        this.age = age;
+    }
     public Director(Long id, String name, Long age, Set<Movie> moviesDirected) {
         this.id = id;
         this.name = name;
