@@ -78,11 +78,10 @@ public class MovieService {
     • Search movies where the rating is above a provided rating. */
 
     public ResponseEntity<List<Movie>> findByDirector(String directorName){
-        return new ResponseEntity<>(movieRepository.findByDirectorName(directorName), HttpStatus.MULTI_STATUS);
+        return new ResponseEntity(movieRepository.findByDirectorName(directorName), HttpStatus.MULTI_STATUS);
     }
 
     public ResponseEntity<List<Movie>> findMoviesWithRatingHigerThan(Long rating){
-        System.out.println("ALL DIRECTORS: "+directorRepository.findByName("Pixar"));
         List<Movie> movies = movieRepository.findAll();
         List<Movie> diff = new ArrayList<>();
         movies.forEach(mov ->{

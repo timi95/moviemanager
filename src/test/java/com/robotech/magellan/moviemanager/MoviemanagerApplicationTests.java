@@ -1,6 +1,5 @@
 package com.robotech.magellan.moviemanager;
 
-import com.robotech.magellan.moviemanager.controllers.HollyWooController;
 import com.robotech.magellan.moviemanager.models.Director;
 import com.robotech.magellan.moviemanager.models.Movie;
 import com.robotech.magellan.moviemanager.models.Rating;
@@ -8,47 +7,56 @@ import com.robotech.magellan.moviemanager.repositories.DirectorRepository;
 import com.robotech.magellan.moviemanager.repositories.MovieRepository;
 import com.robotech.magellan.moviemanager.repositories.RatingRepository;
 import com.robotech.magellan.moviemanager.services.MovieService;
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-
-import org.junit.Assert;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestTemplate;
+import static org.mockito.Mockito.when;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+//@DataJpaTest
+//@ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class MoviemanagerApplicationTests {
-	@Autowired
-	MovieService movieService;
+	@InjectMocks
+	MovieService movieService = new MovieService();
 
-	@Autowired
+	@Mock
 	private MovieRepository movieRepository;
-	@Autowired
+	@Mock
 	private DirectorRepository directorRepository;
-	@Autowired
+	@Mock
 	private RatingRepository ratingRepository;
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
+
+	private Movie movie;
+
+	@BeforeEach
+	 void setup() {
+		//GIVEN
+		String name = "Incredibles 2";
+		List<Rating> ratings = new ArrayList<Rating>(){{
+			add(new Rating(5L));
+			add(new Rating(6L));
+		}};
+		Director director = new Director("Pixar", 45L);
+		movie = new Movie(name, ratings, director);
+//		when().thenThrow();
 	}
 
 	@Test
@@ -62,7 +70,6 @@ class MoviemanagerApplicationTests {
 
 	@Test
 	public void findMovie(){
-		assertNotNull(movieService.findMovie(2l));
 	}
 
 
@@ -73,12 +80,15 @@ class MoviemanagerApplicationTests {
 
 	@Test
 	void addRatingToMovie(){
-		// given
-		ResponseEntity<Movie> response = movieService.addRatingToMovie(2l, new Rating(3l));
-
-		//then
-		assertNotNull(response);
-		assertEquals(HttpStatus.MULTI_STATUS, response.getStatusCode());
+		Movie movie = new Movie("Test Movie",
+				new ArrayList<Rating>(){{
+					add(new Rating(5L));
+				}},
+				new Director("Testarantino", 45l));
+		System.out.println(movieService.getMovies());
+		when(movieRepository.findById(1l)).thenReturn(java.util.Optional.of(movie));
+		when(movieService.addRatingToMovie(1l, new Rating(3l)))
+				.thenReturn(new ResponseEntity(movie, HttpStatus.MULTI_STATUS) );
 	}
 
 
@@ -87,38 +97,23 @@ class MoviemanagerApplicationTests {
     • Search movies where the rating is above a provided rating. */
 	@Test
 	void findByDirector(){
-		//GIVEN
-		String name = "Incredibles 2";
-		List<Rating> ratings = new ArrayList<Rating>(){{
-			add(new Rating(5L));
-			add(new Rating(6L));
+		List<Movie> list = new ArrayList<Movie>(){{
+			add(movie);
 		}};
-		Director director = new Director("Pixar", 45L);
-		Movie movie = movieRepository.save(new Movie(name, ratings, directorRepository.save(director)));
 		//WHEN
-		ResponseEntity<List<Movie>> response = movieService.findByDirector("Pixar");
-
-		//THEN
-		assertTrue( response.getBody().size()>0);
-		assertNotNull(response);
+		when(movieRepository.findByDirectorName("Pixar")).thenReturn(list);
+		assertTrue( movieService.findByDirector("Pixar").getBody().size()>0);
 	}
 
 	@Test
 	void findMoviesWithRatingHigerThan(){
-
+		List<Movie> list = new ArrayList<Movie>(){{
+			add(movie);
+		}};
+		when(movieRepository.findAll()).thenReturn(list);
 		assertNotNull(
 				movieService.findMoviesWithRatingHigerThan(5L)
 						.getBody());
-		assertTrue(
-				movieService.findMoviesWithRatingHigerThan(5L)
-						.getBody()
-						.size() > 0);
-		movieService.findMoviesWithRatingHigerThan(5L)
-				.getBody().forEach( mov -> {
-					mov.getRatings().forEach( rat ->{
-						assertTrue(rat.getRatingValue() > 5);
-					});
-				});
 	}
 
 }
